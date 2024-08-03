@@ -18,15 +18,19 @@ const Header: React.FC = () => {
                 src={logoImg}
                 alt="A plate with food on it."
                 priority />
+                <span>Ella the Housekeeper</span>
             </Link>
 
             <nav className={classes.nav}>
                 <ul>
                     <li>
-                        <NavLink href="/meals">Browse Meals</NavLink>
+                        <NavLink href="/meals">Virtual Shelf</NavLink>
                     </li>
                     <li>
-                        <NavLink href="/community">Foodies Community</NavLink>
+                        <NavLink href="/community">Book of recipes</NavLink>
+                    </li>
+                    <li>
+                        <NavLink href="/community">To-do List</NavLink>
                     </li>
                 </ul>
             </nav>
