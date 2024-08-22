@@ -49,7 +49,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <TranslationsProvider locale={locale} namespaces={I18Nnamespaces}>
-        <body className="flex flex-col relative">{/* the classname means that the body will have a minimum height of the screen, a background color of background, and a font of sans-serif */}
+        <body className="flex flex-col">{/* the classname means that the body will have a minimum height of the screen, a background color of background, and a font of sans-serif */}
           <ThemeProvider
             attribute="class"//the attribute that will be used to store the theme
             defaultTheme="System"//the default theme

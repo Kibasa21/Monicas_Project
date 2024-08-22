@@ -3,7 +3,9 @@ import React from "react";
 
 const todoPage: React.FC = () => {
     return (
-        <TodoList className="" />
+        <div className="relative w-full">
+            <TodoList className="absolute left-20 top-6 pb-14" />
+        </div>
     );
 }
 
