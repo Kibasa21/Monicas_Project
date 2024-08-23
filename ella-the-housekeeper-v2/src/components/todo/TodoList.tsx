@@ -38,6 +38,7 @@ import {
 import RemainingTime from "../CurrentTime"
 import { DoubleArrowLeftIcon, DoubleArrowRightIcon } from "../ui/Icons"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+import { NewTodoButton } from "./NewTodoButton"
 
 const data: Payment[] = [
   {
@@ -255,7 +256,7 @@ export function TodoList({ className }: { className: string }) {
   });
 
   return (
-    <div className={"w-96 " + className}>
+    <div className={"w-[500px] " + className}>
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter Tasks..."
@@ -265,6 +266,7 @@ export function TodoList({ className }: { className: string }) {
           }
           className="max-w-sm"
         />
+        <NewTodoButton />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -347,7 +349,7 @@ export function TodoList({ className }: { className: string }) {
         {table.getFilteredRowModel().rows.length} row(s) selected.
       </div>
       <div className="flex items-center justify-end space-x-2">
-        <div className="flex items-center space-x-6 lg:space-x-3">
+        <div className="flex items-center space-x-6 lg:space-x-[42px]">
           <div className="flex items-center space-x-2">
             <p className="text-sm font-medium">Rows per page</p>
             <Select
