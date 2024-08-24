@@ -59,5 +59,5 @@ export async function insertRow(
   if (error) {
     throw new Error(error.message);
   }
-  return data;
+  return {data, error};
 }

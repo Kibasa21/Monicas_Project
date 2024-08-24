@@ -21,9 +21,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "../../components/ui/input"
@@ -39,6 +36,7 @@ import RemainingTime from "../CurrentTime"
 import { DoubleArrowLeftIcon, DoubleArrowRightIcon } from "../ui/Icons"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { NewTodoButton } from "./NewTodoButton"
+import { TodoForm } from "./TodoForm"
 
 const data: Payment[] = [
   {
@@ -266,7 +264,7 @@ export function TodoList({ className }: { className: string }) {
           }
           className="max-w-sm"
         />
-        <NewTodoButton />
+        <TodoForm />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

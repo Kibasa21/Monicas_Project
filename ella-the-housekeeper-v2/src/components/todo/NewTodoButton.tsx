@@ -60,7 +60,7 @@ export function NewTodoButton() {
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit">Save changes</Button>
+          <Button type="submit" onSubmit={(title) => console.log(title)}>Save changes</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
