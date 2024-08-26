@@ -1,4 +1,6 @@
+import { ShortList } from "@/components/todo/TodoList";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { revalidatePath } from "next/cache";
 import { FormEventHandler } from "react";
 
 export const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string);
@@ -23,10 +25,11 @@ export async function selectColumns(
   supabase: SupabaseClient
 ) {
   const { data, error } = await supabase.from(table).select(columns.join(","));
+  revalidatePath('/[locale]/todo', 'page');
   if (error) {
     throw new Error(error.message);
   }
-  return data;
+  return data as unknown as ShortList[];
 }
 
 export async function selectRow(

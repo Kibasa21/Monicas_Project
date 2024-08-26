@@ -31,6 +31,7 @@ export default function FormTextArea({ form, name, label, placeholder }: {
                                 !field.value && "text-muted-foreground"
                             )}
                             value={field.value || ""}
+                            required
                         />
                     </FormControl>
                     <FormMessage />

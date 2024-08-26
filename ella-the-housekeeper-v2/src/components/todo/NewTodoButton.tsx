@@ -14,8 +14,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "../ui/textarea"
 import { DatePicker } from "../ui/date-picker"
-import { formatRow, insertRow, supabase } from "@/lib/supabaseQuery";
-import { FormEventHandler } from "react";
  
 export function NewTodoButton() {
 

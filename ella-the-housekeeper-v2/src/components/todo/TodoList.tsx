@@ -35,95 +35,13 @@ import {
 import RemainingTime from "../CurrentTime"
 import { DoubleArrowLeftIcon, DoubleArrowRightIcon } from "../ui/Icons"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
-import { NewTodoButton } from "./NewTodoButton"
 import { TodoForm } from "./TodoForm"
 
-const data: Payment[] = [
-  {
-    id: "m5gr84i9",
-    time: new Date('2024-12-31T23:59:59'),
-    status: "processing",
-    task: "Learn React",
-  },
-  {
-    id: "3u1reuv4",
-    time: new Date('2024-12-31T23:59:59'),
-    status: "processing",
-    task: "Learn Next.js",
-  },
-  {
-    id: "derv1ws0",
-    time: new Date('2024-12-31T23:59:59'),
-    status: "processing",
-    task: "Build my mom's website",
-  },
-  {
-    id: "5kma53ae",
-    time: new Date('2025-12-31T23:59:59'),
-    status: "processing",
-    task: "Get the job!",
-  },
-  {
-    id: "is83bndk",
-    time: new Date('2024-08-22T15:37:30'),
-    status: "failed",
-    task: "Hello",
-  },
-  {
-    id: "is83bndk",
-    time: new Date('2024-08-22T15:37:30'),
-    status: "failed",
-    task: "Hello",
-  },
-  {
-    id: "is83bndk",
-    time: new Date('2024-08-22T15:37:30'),
-    status: "failed",
-    task: "Hello",
-  },
-  {
-    id: "is83bndk",
-    time: new Date('2024-08-22T15:37:30'),
-    status: "failed",
-    task: "Hello",
-  },
-  {
-    id: "is83bndk",
-    time: new Date('2024-08-22T15:37:30'),
-    status: "failed",
-    task: "Hello",
-  },
-  {
-    id: "is83bndk",
-    time: new Date('2024-08-22T15:37:30'),
-    status: "failed",
-    task: "Hello",
-  },
-  {
-    id: "is83bndk",
-    time: new Date('2024-08-22T15:37:30'),
-    status: "failed",
-    task: "Hello",
-  },
-  {
-    id: "is83bndk",
-    time: new Date('2024-08-22T15:37:30'),
-    status: "failed",
-    task: "Hello",
-  },
-  {
-    id: "is83bndk",
-    time: new Date('2024-08-22T15:37:30'),
-    status: "failed",
-    task: "Hello",
-  },
-]
-
-export type Payment = {
+export type ShortList = {
   id: string
-  time: Date
-  status: "pending" | "processing" | "success" | "failed"
-  task: string
+  deadline: Date
+  status: "In Progress" | "Success" | "Failed"
+  title: string
 }
 
 function formatDateTimeUS(date: Date): string {
@@ -138,7 +56,7 @@ function formatDateTimeUS(date: Date): string {
   });
 }
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<ShortList>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -169,12 +87,12 @@ export const columns: ColumnDef<Payment>[] = [
     ),
   },
   {
-    accessorKey: "task",
+    accessorKey: "title",
     header: () => <div className="text-center">Task</div>,
-    cell: ({ row }) => <div className="lowercase text-center">{row.getValue("task")}</div>,
+    cell: ({ row }) => <div className="lowercase text-center">{row.getValue("title")}</div>,
   },
   {
-    accessorKey: "time",
+    accessorKey: "deadline",
     header: ({ column }) => {
       return (
         <div className="text-center">
@@ -189,43 +107,14 @@ export const columns: ColumnDef<Payment>[] = [
       )
     },
     cell: ({ row }) => {
-      const time = row.getValue("time") as Date;
+      const time = row.getValue("deadline") as Date;
 
-      return <RemainingTime time={time} setTime={new Date('2024-08-21T15:36:30')} />;
+      return <RemainingTime time={time} setTime={new Date()} />;
     },
   },
-  // {
-  //   id: "actions",
-  //   enableHiding: false,
-  //   cell: ({ row }) => {
-  //     const payment = row.original
-
-  //     return (
-  //       <DropdownMenu>
-  //         <DropdownMenuTrigger asChild>
-  //           <Button variant="ghost" className="h-8 w-8 p-0">
-  //             <span className="sr-only">Open menu</span>
-  //             <MoreHorizontal className="h-4 w-4" />
-  //           </Button>
-  //         </DropdownMenuTrigger>
-  //         <DropdownMenuContent align="end">
-  //           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-  //           <DropdownMenuItem
-  //             onClick={() => navigator.clipboard.writeText(payment.id)}
-  //           >
-  //             Copy payment ID
-  //           </DropdownMenuItem>
-  //           <DropdownMenuSeparator />
-  //           <DropdownMenuItem>View customer</DropdownMenuItem>
-  //           <DropdownMenuItem>View payment details</DropdownMenuItem>
-  //         </DropdownMenuContent>
-  //       </DropdownMenu>
-  //     )
-  //   },
-  // },
 ]
 
-export function TodoList({ className }: { className: string }) {
+export function TodoList({ className, list }: { className: string, list: ShortList[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -235,7 +124,7 @@ export function TodoList({ className }: { className: string }) {
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data,
+    data: list,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -258,9 +147,9 @@ export function TodoList({ className }: { className: string }) {
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter Tasks..."
-          value={(table.getColumn("task")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("task")?.setFilterValue(event.target.value)
+            table.getColumn("title")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

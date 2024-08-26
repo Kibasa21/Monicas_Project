@@ -30,6 +30,7 @@ export default function FormInput({ form, name, label, placeholder }: {
                                 "w-[240px] pl-3 text-left font-normal",
                                 !field.value && "text-muted-foreground"
                             )}
+                            value={field.value || ""}
                             required
                         />
                     </FormControl>

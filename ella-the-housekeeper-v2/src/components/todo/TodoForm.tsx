@@ -9,7 +9,6 @@ import {Form} from "@/components/ui/form"
 import { toast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import FormatedForm from "../ui/formated-form"
-import { insertRow, supabase } from "@/lib/supabaseQuery"
 import React from "react"
 
 const FormSchema = z.object({
