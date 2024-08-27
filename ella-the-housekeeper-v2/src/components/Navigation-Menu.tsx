@@ -80,7 +80,7 @@ export function NavigationMenuComponent({ content }: {
     <NavigationMenu>
       <NavigationMenuList className="space-x-0 md:space-x-5">
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="text-base font-Kanit font-semibold">{content.navegationTitles[0]}</NavigationMenuTrigger>
+          <NavigationMenuTrigger className="text-base font-semibold">{content.navegationTitles[0]}</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
               <li className="row-span-3">
@@ -93,20 +93,20 @@ export function NavigationMenuComponent({ content }: {
                   </a>
                 </NavigationMenuLink>
               </li>
-              <ListItem href="/docs" title={content.navegationDescriptions.shelfTitles[0]} className="font-Kanit" onMouseOver={() => onHover(1)}>
+              <ListItem href="/docs" title={content.navegationDescriptions.shelfTitles[0]} className="" onMouseOver={() => onHover(1)}>
                 {content.navegationDescriptions.shelfDescriptions.foodSupplies}
               </ListItem>
-              <ListItem href="/docs/installation" title={content.navegationDescriptions.shelfTitles[1]} className="font-Kanit" onMouseOver={() => onHover(2)}>
+              <ListItem href="/docs/installation" title={content.navegationDescriptions.shelfTitles[1]} className="" onMouseOver={() => onHover(2)}>
                 {content.navegationDescriptions.shelfDescriptions.cleaningSupplies}
               </ListItem>
-              <ListItem href="/docs/primitives/typography" title={content.navegationDescriptions.shelfTitles[2]} className="font-Kanit" onMouseOver={() => onHover(3)}>
+              <ListItem href="/docs/primitives/typography" title={content.navegationDescriptions.shelfTitles[2]} className="" onMouseOver={() => onHover(3)}>
                 {content.navegationDescriptions.shelfDescriptions.hygieneSupplies}
               </ListItem>
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="text-base font-Kanit font-semibold"><Link href="/todo">{content.navegationTitles[1]}</Link></NavigationMenuTrigger>
+          <NavigationMenuTrigger className="text-base font-semibold"><Link href="/todo">{content.navegationTitles[1]}</Link></NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
               {components.map((component) => (
@@ -114,7 +114,7 @@ export function NavigationMenuComponent({ content }: {
                   key={component.title}
                   title={component.title}
                   href={component.href}
-                  className="font-Kanit"
+                  className=""
                 >
                   {component.description}
                 </ListItem>
@@ -124,14 +124,14 @@ export function NavigationMenuComponent({ content }: {
         </NavigationMenuItem>
         <NavigationMenuItem>
           <Link href="/docs" legacyBehavior passHref>
-            <NavigationMenuLink className={navigationMenuTriggerStyle() + " text-base font-Kanit font-semibold"}>
+            <NavigationMenuLink className={navigationMenuTriggerStyle() + " text-base font-semibold"}>
               {content.navegationTitles[2]}
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
         <NavigationMenuItem>
           <Link href="/docs" legacyBehavior passHref>
-            <NavigationMenuLink className={navigationMenuTriggerStyle() + " text-base font-Kanit font-semibold"}>
+            <NavigationMenuLink className={navigationMenuTriggerStyle() + " text-base font-semibold"}>
               {content.navegationTitles[3]}
             </NavigationMenuLink>
           </Link>

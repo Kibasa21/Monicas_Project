@@ -1,6 +1,6 @@
 "use client"
 
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -9,21 +9,20 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, ChevronLeftIcon, ChevronRightIcon, MoreHorizontal } from "lucide-react"
+} from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, ChevronLeftIcon, ChevronRightIcon, MoreHorizontal } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "../../components/ui/input"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "../../components/ui/input";
 import {
   Table,
   TableBody,
@@ -31,18 +30,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import RemainingTime from "../CurrentTime"
-import { DoubleArrowLeftIcon, DoubleArrowRightIcon } from "../ui/Icons"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
-import { TodoForm } from "./TodoForm"
+} from "@/components/ui/table";
+import RemainingTime from "../CurrentTime";
+import { TodoForm } from "./TodoForm";
+import { ScrollArea } from "../ui/scroll-area";
+import { supabase, updateRow } from "@/app/api/supabaseQuery";
 
 export type ShortList = {
-  id: string
-  deadline: Date
-  status: "In Progress" | "Success" | "Failed"
-  title: string
-}
+  id: string;
+  deadline: Date;
+  status: "In Progress" | "Success" | "Failed";
+  title: string;
+};
 
 function formatDateTimeUS(date: Date): string {
   return date.toLocaleString('en-US', {
@@ -54,6 +53,17 @@ function formatDateTimeUS(date: Date): string {
     second: 'numeric',
     hour12: true
   });
+}
+
+function changeStatus(isSelected: boolean, deadline: Date): string {
+  const status = ["In Progress", "Success", "Failed"];
+  if (deadline < new Date()) {
+    return status[2];
+  } else if (isSelected) {
+    return status[1];
+  } else {
+    return status[0];
+  }
 }
 
 export const columns: ColumnDef<ShortList>[] = [
@@ -71,8 +81,21 @@ export const columns: ColumnDef<ShortList>[] = [
     ),
     cell: ({ row }) => (
       <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        defaultChecked={row.getValue('status') === 'Success'}
+        //checked={row.getIsSelected()}
+        onCheckedChange={(value) => {
+          row.toggleSelected(!!value);
+          switch (row.original.status) {
+            case "In Progress":
+              row.original.status = "Success";
+              break;
+            case "Success":
+              row.original.status = "In Progress";
+              break;
+            case "Failed":
+              break;
+          }
+        }}
         aria-label="Select row"
       />
     ),
@@ -83,19 +106,19 @@ export const columns: ColumnDef<ShortList>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
+      <div className="capitalize">{row.original.status}</div>
     ),
   },
   {
     accessorKey: "title",
-    header: () => <div className="text-center">Task</div>,
-    cell: ({ row }) => <div className="lowercase text-center">{row.getValue("title")}</div>,
+    header: () => <div className="text-right">Task</div>,
+    cell: ({ row }) => <div className="lowercase text-left">{row.getValue("title")}</div>,
   },
   {
     accessorKey: "deadline",
     header: ({ column }) => {
       return (
-        <div className="text-center">
+        <div className="text-right">
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -104,7 +127,7 @@ export const columns: ColumnDef<ShortList>[] = [
             Time Left
           </Button>
         </div>
-      )
+      );
     },
     cell: ({ row }) => {
       const time = row.getValue("deadline") as Date;
@@ -112,7 +135,7 @@ export const columns: ColumnDef<ShortList>[] = [
       return <RemainingTime time={time} setTime={new Date()} />;
     },
   },
-]
+];
 
 export function TodoList({ className, list }: { className: string, list: ShortList[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -129,7 +152,6 @@ export function TodoList({ className, list }: { className: string, list: ShortLi
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -141,6 +163,26 @@ export function TodoList({ className, list }: { className: string, list: ShortLi
       rowSelection,
     },
   });
+
+  const handleBeforeUnload = async () => {
+
+    const updatePromises = table.getRowModel().rows.map(async (row) => {
+      if (row.original.status !== row.getValue('status')) {
+        return updateRow("TodoList", "id", row.original.id, { status: row.original.status }, supabase);
+      }
+      return Promise.resolve();
+    });
+
+    await Promise.all(updatePromises);
+  };
+
+  React.useEffect(() => {
+    window.addEventListener('beforeunload', handleBeforeUnload,);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
 
   return (
     <div className={"w-[500px] " + className}>
@@ -176,7 +218,7 @@ export function TodoList({ className, list }: { className: string, list: ShortLi
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -196,111 +238,49 @@ export function TodoList({ className, list }: { className: string, list: ShortLi
                           header.getContext()
                         )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
         </Table>
+        <ScrollArea className="h-[400px]">
+          <Table>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </ScrollArea>
       </div>
       <div className="flex-1 text-sm text-muted-foreground text-center py-1">
         {table.getFilteredSelectedRowModel().rows.length} of{" "}
         {table.getFilteredRowModel().rows.length} row(s) selected.
       </div>
-      <div className="flex items-center justify-end space-x-2">
-        <div className="flex items-center space-x-6 lg:space-x-[42px]">
-          <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">Rows per page</p>
-            <Select
-              value={`${table.getState().pagination.pageSize}`}
-              onValueChange={(value) => {
-                table.setPageSize(Number(value))
-              }}
-            >
-              <SelectTrigger className="h-8 w-[70px]">
-                <SelectValue placeholder={table.getState().pagination.pageSize} />
-              </SelectTrigger>
-              <SelectContent side="top">
-                {[5, 10, 20, 30, 40, 50].map((pageSize) => (
-                  <SelectItem key={pageSize} value={`${pageSize}`}>
-                    {pageSize}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page {table.getState().pagination.pageIndex + 1} of{" "}
-            {table.getPageCount()}
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex"
-              onClick={() => table.setPageIndex(0)}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <span className="sr-only">Go to first page</span>
-              <DoubleArrowLeftIcon className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="h-8 w-8 p-0"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <span className="sr-only">Go to previous page</span>
-              <ChevronLeftIcon className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="h-8 w-8 p-0"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              <span className="sr-only">Go to next page</span>
-              <ChevronRightIcon className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="hidden h-8 w-8 p-0 lg:flex"
-              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-              disabled={!table.getCanNextPage()}
-            >
-              <span className="sr-only">Go to last page</span>
-              <DoubleArrowRightIcon className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
     </div>
-  )
+  );
 }

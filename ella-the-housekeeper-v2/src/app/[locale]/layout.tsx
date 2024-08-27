@@ -7,6 +7,7 @@ import Logo from "@/components/Logo-Toggle";
 import initTranslations from "../i18n";
 import TranslationsProvider from "@/components/TranslationProvider";
 import LanguageChanger from "@/components/LanguageChanger";
+import '@fontsource-variable/inter';
 
 export const metadata: Metadata = {
   title: "Ella the Housekeeper",
@@ -49,7 +50,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <TranslationsProvider locale={locale} namespaces={I18Nnamespaces}>
-        <body className="flex flex-col">{/* the classname means that the body will have a minimum height of the screen, a background color of background, and a font of sans-serif */}
+        <body className="flex flex-col font-Inter font-bold">{/* the classname means that the body will have a minimum height of the screen, a background color of background, and a font of sans-serif */}
           <ThemeProvider
             attribute="class"//the attribute that will be used to store the theme
             defaultTheme="System"//the default theme

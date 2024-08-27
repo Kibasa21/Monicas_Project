@@ -64,3 +64,17 @@ export async function insertRow(
   }
   return {data, error};
 }
+
+export async function updateRow(
+  table: string,
+  rowType: string,
+  rowValue: string,
+  row: Record<string, any>,
+  supabase: SupabaseClient
+) {
+  const { data, error } = await supabase.from(table).update(row).eq(rowType, rowValue);
+  if (error) {
+    throw new Error(error.message);
+  }
+  return {data, error};
+}

@@ -22,6 +22,7 @@ const config = {
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
         Kanit: ["Kanit", "sans-serif"],
+        Inter: ["Inter", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

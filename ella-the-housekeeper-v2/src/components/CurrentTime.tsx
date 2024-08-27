@@ -49,5 +49,5 @@ export default function RemainingTime({time, setTime}: {time: Date, setTime: Dat
          };
     }, [])
 
-    return <div className="text-center font-medium">{formatTime(remainingTime)}</div>;
+    return <div className="text-left font-medium">{formatTime(remainingTime)}</div>;
 }
