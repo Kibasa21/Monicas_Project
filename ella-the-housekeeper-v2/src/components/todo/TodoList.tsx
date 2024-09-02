@@ -71,7 +71,7 @@ export const columns: ColumnDef<ShortList>[] = [
     ),
     cell: ({ row }) => (
       <Checkbox
-        defaultChecked={row.getValue('status') === 'Success'}
+        defaultChecked={row.original.status === 'Success'}
         //checked={row.getIsSelected()}
         onCheckedChange={(value) => {
           row.toggleSelected(!!value);
