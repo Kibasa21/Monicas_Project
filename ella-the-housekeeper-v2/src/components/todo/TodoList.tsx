@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
+  Row,
   SortingState,
   VisibilityState,
   flexRender,
@@ -35,34 +36,23 @@ import RemainingTime from "../CurrentTime";
 import { TodoForm } from "./TodoForm";
 import { ScrollArea } from "../ui/scroll-area";
 import { supabase, updateRow } from "@/app/api/supabaseQuery";
+import SelectStatusFilter from "./SelectStatusFilter";
+import FilteredStatus from "./FilteredStatus";
 
 export type ShortList = {
   id: string;
   deadline: Date;
-  status: "In Progress" | "Success" | "Failed";
+  status: "In Progress" | "Success" | "Pending";
   title: string;
 };
 
-function formatDateTimeUS(date: Date): string {
-  return date.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: true
-  });
-}
+function changeStatus(row: Row<ShortList>): string {
 
-function changeStatus(isSelected: boolean, deadline: Date): string {
-  const status = ["In Progress", "Success", "Failed"];
-  if (deadline < new Date()) {
-    return status[2];
-  } else if (isSelected) {
-    return status[1];
+  if (row.original.deadline.getTime() > new Date().getTime() || row.original.status === 'Success' || row.original.status === 'Pending') {
+    return row.original.status;
   } else {
-    return status[0];
+    row.original.status = 'Pending';
+    return row.original.status;
   }
 }
 
@@ -92,7 +82,7 @@ export const columns: ColumnDef<ShortList>[] = [
             case "Success":
               row.original.status = "In Progress";
               break;
-            case "Failed":
+            case "Pending":
               break;
           }
         }}
@@ -106,7 +96,7 @@ export const columns: ColumnDef<ShortList>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
-      <div className="capitalize">{row.original.status}</div>
+      <div className="capitalize">{changeStatus(row)}</div>
     ),
   },
   {
@@ -145,6 +135,7 @@ export function TodoList({ className, list }: { className: string, list: ShortLi
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [filter, setFilter] = React.useState<string>('In Progress');
 
   const table = useReactTable({
     data: list,
@@ -196,32 +187,13 @@ export function TodoList({ className, list }: { className: string, list: ShortLi
           className="max-w-sm"
         />
         <TodoForm />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <SelectStatusFilter content={
+          ['In Progress', 'Success', 'Pending', 'All']
+        }
+        filter={setFilter}
+        label="Status"
+        placeholder="In Progress"
+        />
       </div>
       <div className="rounded-md border">
         <Table>
@@ -245,42 +217,13 @@ export function TodoList({ className, list }: { className: string, list: ShortLi
           </TableHeader>
         </Table>
         <ScrollArea className="h-[400px]">
-          <Table>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+          <FilteredStatus table={table} columns={columns} filter={filter} />
         </ScrollArea>
       </div>
-      <div className="flex-1 text-sm text-muted-foreground text-center py-1">
+      {/* <div className="flex-1 text-sm text-muted-foreground text-center py-1">
         {table.getFilteredSelectedRowModel().rows.length} of{" "}
         {table.getFilteredRowModel().rows.length} row(s) selected.
-      </div>
+      </div> */}
     </div>
   );
 }
