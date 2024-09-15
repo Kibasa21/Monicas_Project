@@ -73,6 +73,20 @@ export async function updateRow(
   supabase: SupabaseClient
 ) {
   const { data, error } = await supabase.from(table).update(row).eq(rowType, rowValue);
+  revalidatePath('/[locale]/todo', 'page');
+  if (error) {
+    throw new Error(error.message);
+  }
+  return {data, error};
+}
+
+export async function deleteRow(
+  table: string,
+  rowType: string,
+  rowValue: string,
+  supabase: SupabaseClient
+) {
+  const { data, error } = await supabase.from(table).delete().eq(rowType, rowValue);
   if (error) {
     throw new Error(error.message);
   }

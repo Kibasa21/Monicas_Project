@@ -1,4 +1,3 @@
-'use client';
 import { ColumnDef, flexRender, Table as TableTodo } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableRow } from "../ui/table";
 import { ShortList } from "./TodoList";
@@ -11,6 +10,8 @@ export default function FilteredStatus({ table, columns, filter }: {
 }): JSX.Element {
 
   let isEmpty = true;
+
+  console.log(filter);
 
   return (
     <Table>
@@ -49,9 +50,14 @@ export default function FilteredStatus({ table, columns, filter }: {
           </TableRow>
         )}
         {isEmpty &&
-          <div className="flex-1 text-sm text-muted-foreground text-center py-1 my-3">
-            No results.
-          </div>
+          <TableRow>
+            <TableCell
+              colSpan={columns.length}
+              className="h-24 text-center"
+            >
+              No results.
+            </TableCell>
+          </TableRow>
         }
       </TableBody>
     </Table>

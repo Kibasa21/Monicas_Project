@@ -6,10 +6,11 @@ import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import {Form} from "@/components/ui/form"
-import { toast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import FormatedForm from "../ui/formated-form"
 import React from "react"
+import { Table } from "@tanstack/react-table"
+import { ShortList } from "./TodoList"
 
 const FormSchema = z.object({
     deadline: z.date({
@@ -25,7 +26,7 @@ const FormSchema = z.object({
 
 type FormSchemaType = z.infer<typeof FormSchema>
 
-export function TodoForm() {
+export function TodoForm({table}: {table: Table<ShortList>}) {
     const [open, setOpen] = React.useState(false);
     const form = useForm<FormSchemaType>({
         resolver: zodResolver(FormSchema),
@@ -47,7 +48,7 @@ export function TodoForm() {
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                    <FormatedForm form={form} FormSchema={FormSchema} setOpen={setOpen}>
+                    <FormatedForm form={form} FormSchema={FormSchema} setOpen={setOpen} table={table}>
                         <FormatedForm.input form={form} name="title" label="Title:" placeholder="Save the world" />
                         <FormatedForm.textarea form={form} name="description" label="Description:" placeholder="Clean the evilness from the world!" />
                         <FormatedForm.date form={form} name="deadline" label="Due to:" />

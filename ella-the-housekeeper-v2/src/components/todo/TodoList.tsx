@@ -6,6 +6,7 @@ import {
   ColumnFiltersState,
   Row,
   SortingState,
+  Table,
   VisibilityState,
   flexRender,
   getCoreRowModel,
@@ -13,21 +14,13 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, ChevronLeftIcon, ChevronRightIcon, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "../../components/ui/input";
 import {
-  Table,
-  TableBody,
-  TableCell,
+  Table as TableTodo,
   TableHead,
   TableHeader,
   TableRow,
@@ -35,9 +28,10 @@ import {
 import RemainingTime from "../CurrentTime";
 import { TodoForm } from "./TodoForm";
 import { ScrollArea } from "../ui/scroll-area";
-import { supabase, updateRow } from "@/app/api/supabaseQuery";
+import { deleteRow, supabase, updateRow } from "@/app/api/supabaseQuery";
 import SelectStatusFilter from "./SelectStatusFilter";
 import FilteredStatus from "./FilteredStatus";
+import ChangeStatus from "../ui/change-status";
 
 export type ShortList = {
   id: string;
@@ -46,29 +40,19 @@ export type ShortList = {
   title: string;
 };
 
-function changeStatus(row: Row<ShortList>): string {
-
-  if (row.original.deadline.getTime() > new Date().getTime() || row.original.status === 'Success' || row.original.status === 'Pending') {
-    return row.original.status;
-  } else {
-    row.original.status = 'Pending';
-    return row.original.status;
-  }
-}
-
 export const columns: ColumnDef<ShortList>[] = [
   {
     id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
+    // header: ({ table }) => (
+    //   <Checkbox
+    //     checked={
+    //       table.getIsAllPageRowsSelected() ||
+    //       (table.getIsSomePageRowsSelected() && "indeterminate")
+    //     }
+    //     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+    //     aria-label="Select all"
+    //   />
+    // ),
     cell: ({ row }) => (
       <Checkbox
         defaultChecked={row.original.status === 'Success'}
@@ -95,9 +79,15 @@ export const columns: ColumnDef<ShortList>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => (
-      <div className="capitalize">{changeStatus(row)}</div>
-    ),
+    cell: ({ row }) => {
+      console.log(row.original.status, row.original.title);
+      return (
+          row.original.status === 'In Progress' ?
+          <ChangeStatus time={row.original.deadline} setTime={new Date()} row={row} />
+          :
+          <div className="capitalize">{row.original.status}</div>
+      )
+    },
   },
   {
     accessorKey: "title",
@@ -127,7 +117,29 @@ export const columns: ColumnDef<ShortList>[] = [
   },
 ];
 
-export function TodoList({ className, list }: { className: string, list: ShortList[] }) {
+  // Função para atualizar os dados
+  const updateData = async (initialList: ShortList[], table: Table<ShortList>) => {
+    console.log(initialList[6])
+    const updatePromises = table.getRowModel().rows.map(async (row, index) => {
+      console.log(initialList[index]);
+      if(initialList[index]===undefined) {
+        console.log('undefined')
+        return await updateRow("TodoList", "id", row.original.id, { status: row.original.status }, supabase);
+      }
+      if (row.original.status !== initialList[index].status) {
+        console.log('passou')
+        return await updateRow("TodoList", "id", row.original.id, { status: row.original.status }, supabase);
+      }
+      if (new Date().getTime() - row.original.deadline.getTime() > (1000 * 60 * 60 * 24 * 30)) {
+        return await deleteRow("TodoList", "id", row.original.id, supabase);
+      }
+      return Promise.resolve();
+    });
+
+    await Promise.all(updatePromises);
+  };
+
+export function TodoList({ className, initialList }: { className: string, initialList: ShortList[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -136,9 +148,12 @@ export function TodoList({ className, list }: { className: string, list: ShortLi
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [filter, setFilter] = React.useState<string>('In Progress');
+  const [reload, setReload] = React.useState<number>(0);
 
+  const usefulList = [...initialList];
+  
   const table = useReactTable({
-    data: list,
+    data: usefulList,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -155,23 +170,31 @@ export function TodoList({ className, list }: { className: string, list: ShortLi
     },
   });
 
-  const handleBeforeUnload = async () => {
+  console.log(initialList);
+  console.log(rowSelection)
 
-    const updatePromises = table.getRowModel().rows.map(async (row) => {
-      if (row.original.status !== row.getValue('status')) {
-        return updateRow("TodoList", "id", row.original.id, { status: row.original.status }, supabase);
-      }
-      return Promise.resolve();
-    });
-
-    await Promise.all(updatePromises);
-  };
-
+  // Efeito para salvar dados periodicamente
   React.useEffect(() => {
-    window.addEventListener('beforeunload', handleBeforeUnload,);
+    const saveInterval = setInterval(async() => {
+      await updateData(initialList, table);
+      console.log(reload);
+      setReload((prevReload: number) => prevReload + 1);
+    }, 1*1000*60); // Salva a cada 60 segundos
+
+    return () => clearInterval(saveInterval);
+  }, [table]);
+
+  // Efeito para tentar salvar dados antes de descarregar a página
+  React.useEffect(() => {
+    const handleUnload = async () => {
+      // Nota: Isso pode não funcionar em todos os navegadores para operações assíncronas
+      await updateData(initialList, table);
+    };
+
+    window.addEventListener('unload', handleUnload);
 
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('unload', handleUnload);
     };
   }, []);
 
@@ -186,17 +209,17 @@ export function TodoList({ className, list }: { className: string, list: ShortLi
           }
           className="max-w-sm"
         />
-        <TodoForm />
+        <TodoForm table={table} />
         <SelectStatusFilter content={
           ['In Progress', 'Success', 'Pending', 'All']
         }
-        filter={setFilter}
-        label="Status"
-        placeholder="In Progress"
+          filter={setFilter}
+          label="Status"
+          placeholder="In Progress"
         />
       </div>
       <div className="rounded-md border">
-        <Table>
+        <TableTodo>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -215,7 +238,7 @@ export function TodoList({ className, list }: { className: string, list: ShortLi
               </TableRow>
             ))}
           </TableHeader>
-        </Table>
+        </TableTodo>
         <ScrollArea className="h-[400px]">
           <FilteredStatus table={table} columns={columns} filter={filter} />
         </ScrollArea>

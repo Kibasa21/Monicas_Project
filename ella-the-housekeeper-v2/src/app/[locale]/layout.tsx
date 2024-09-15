@@ -8,6 +8,8 @@ import initTranslations from "../i18n";
 import TranslationsProvider from "@/components/TranslationProvider";
 import LanguageChanger from "@/components/LanguageChanger";
 import '@fontsource-variable/inter';
+import { Suspense } from "react";
+import { LoadingScreen } from "@/components/ui/loading-screen";
 
 export const metadata: Metadata = {
   title: "Ella the Housekeeper",
@@ -65,7 +67,9 @@ export default async function RootLayout({
             <div className="fixed left-1 bottom-1">
               <ModeToggle />
             </div>
-            {children}
+            <Suspense fallback={<LoadingScreen/>}>
+              {children}
+            </Suspense>
           </ThemeProvider>
         </body>
       </TranslationsProvider>

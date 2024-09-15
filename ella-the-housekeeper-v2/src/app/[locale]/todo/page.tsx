@@ -22,9 +22,11 @@ export default async function TodoPage (): Promise<JSX.Element> {
 
     const list = await selectList();
 
+    console.log(list)
+
     return (
         <div className="relative w-full">
-            <TodoList className="absolute left-20 top-6 pb-14" list={list} />
+            <TodoList className="absolute left-20 top-6 pb-14" initialList={[...list]} />
         </div>
     );
 }
