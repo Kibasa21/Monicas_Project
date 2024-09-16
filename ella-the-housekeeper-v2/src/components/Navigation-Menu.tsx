@@ -10,7 +10,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
-import PendingListItem from "./PendingListItem"
+import { PendingListItem } from "./PendingListItem"
 import { FallBackComponent } from "./ui/fall-back-component"
 import ShelfHover from "./ShelfHover"
 

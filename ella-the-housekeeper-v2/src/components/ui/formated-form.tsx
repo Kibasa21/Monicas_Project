@@ -7,11 +7,12 @@ import FormTextArea from "./FormItems/form-textarea";
 import FormDate from "./FormItems/form-date";
 import { DialogFooter } from "./dialog";
 import { z } from "zod"
-import { deleteRow, insertRow, supabase, updateRow } from "@/app/api/supabaseQuery";
+import { deleteRow, insertRow, supabase, updateRow } from "@/api/";
 import { useRouter } from 'next/navigation'
 import { useState } from "react";
 import { Table } from "@tanstack/react-table";
 import { ShortList } from "../todo/TodoList";
+import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query'
 
 export default function FormatedForm({ children, className = "space-y-8", form, Submit = "Submit", FormSchema, setOpen, table }: {
     children: JSX.Element | JSX.Element[],
@@ -26,6 +27,7 @@ export default function FormatedForm({ children, className = "space-y-8", form, 
     const [pending, setPending] = useState(false)
 
     const router = useRouter();
+    const queryClient = new QueryClient()
 
     type FormSchemaType = z.infer<typeof FormSchema>
 
@@ -49,6 +51,10 @@ export default function FormatedForm({ children, className = "space-y-8", form, 
           await Promise.all(updatePromises);
         console.log(input,error);
         form.reset();
+
+        queryClient.invalidateQueries('app')
+        
+
         setOpen(false);
         setPending(false);
         router.refresh();

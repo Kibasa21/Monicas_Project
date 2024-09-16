@@ -1,10 +1,11 @@
 "use client"
 
 import * as React from "react";
+import { useEffect } from "react";
 import {
-  ColumnDef,
+  type ColumnDef,
   flexRender,
-  Table
+  type Table
 } from "@tanstack/react-table";
 import {
   Table as TableTodo,
@@ -13,7 +14,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ScrollArea } from "../ui/scroll-area";
-import { deleteRow, supabase, updateRow } from "@/app/api/supabaseQuery";
+import { deleteRow, updateRow } from "@/api";
+import { useSupabaseBrowser }  from '@/utils/supabase-browser'
 import FilteredStatus from "./FilteredStatus";
 import { ShortList } from "./TodoList";
 
@@ -38,7 +40,7 @@ import { ShortList } from "./TodoList";
     await Promise.all(updatePromises);
   };
 
-export function TasksScroll({ initialList, table, columns }: { 
+export function TasksScroll({ table, columns }: { 
   initialList: ShortList[],
   table: Table<ShortList>,
   columns: ColumnDef<ShortList>[]
@@ -46,59 +48,33 @@ export function TasksScroll({ initialList, table, columns }: {
 
   const [reload, setReload] = React.useState<number>(0);
 
-  const usefulList:ShortList[] = [...initialList.map((item) => ({ ...item }))];
-
-  //console.log(initialList);
-  //console.log(usefulList)
-  // Efeito para salvar dados periodicamente
-  React.useEffect(() => {
-    const saveInterval = setInterval(async() => {
-      await updateData(initialList, usefulList);
-      setReload((prevReload: number) => prevReload + 1);
-    }, 1*1000*60); // Salva a cada 60 segundos
-
-    return () => clearInterval(saveInterval);
-  }, [initialList, usefulList]);
-
-  // Efeito para tentar salvar dados antes de descarregar a página
-  React.useEffect(() => {
-    const handleUnload = async () => {
-      // Nota: Isso pode não funcionar em todos os navegadores para operações assíncronas
-      await updateData(initialList, usefulList);
-    };
-
-    window.addEventListener('unload', handleUnload);
-
-    return () => {
-      window.removeEventListener('unload', handleUnload);
-    };
-  }, []);
+  const supabase = useSupabaseBrowser()
 
   return (
-      <div className="rounded-md border">
-        <TableTodo>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-        </TableTodo>
-        <ScrollArea className="h-[400px]">
-          <FilteredStatus table={table} columns={columns} />
-        </ScrollArea>
-      </div>
+    <div className="rounded-md border">
+      <TableTodo>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+      </TableTodo>
+      <ScrollArea className="h-[400px]">
+        <FilteredStatus table={table} columns={columns} />
+      </ScrollArea>
+    </div>
   );
 }

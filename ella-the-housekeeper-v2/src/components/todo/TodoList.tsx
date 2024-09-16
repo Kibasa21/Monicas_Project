@@ -2,28 +2,46 @@
 
 import * as React from "react";
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
+  flexRender,
+  type Table,
+  type ColumnDef,
+  type ColumnFiltersState,
+  type SortingState,
+  type VisibilityState,
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { useSupabaseBrowser }  from '@/utils/supabase-browser'
 import { ArrowUpDown } from "lucide-react";
+import { useQuery } from '@tanstack/react-query'
+
+import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query'
+import { prefetchQuery } from '@supabase-cache-helpers/postgrest-react-query'
+//import { cookies } from 'next/headers'
+import { getCountryById } from '@/api'
+import { cn } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "../../components/ui/input";
 import RemainingTime from "../CurrentTime";
 import { TodoForm } from "./TodoForm";
-import { deleteRow, supabase, updateRow } from "@/app/api/supabaseQuery";
 import SelectStatusFilter from "./SelectStatusFilter";
 import ChangeStatus from "../ui/change-status";
 import { TasksScroll } from "./TasksScroll";
 import { FilterStoreProvider } from "@/store/filter-status-context";
 import { TodoHeader } from "./TodoHeader";
+import { useEffect } from "react";
+import {
+  Table as TableTodo,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ScrollArea } from "../ui/scroll-area";
+import FilteredStatus from "./FilteredStatus";
 
 export type ShortList = {
   id: string;
@@ -108,7 +126,7 @@ export const columns: ColumnDef<ShortList>[] = [
   },
 ];
 
-export function TodoList({ className, initialList }: { className: string, initialList: ShortList[] }) {
+export function TodoList({ className }: { className: string }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -117,10 +135,20 @@ export function TodoList({ className, initialList }: { className: string, initia
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const usefulList: ShortList[] = [...initialList.map((item) => ({ ...item }))];
+  const queryClient = new QueryClient()
+  //const cookieStore = cookies()
+  const supabase = useSupabaseBrowser()
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['app', 'todos', 'list'],
+    queryFn: () => supabase.from(table).select(columns.join(","))
+  })
+  
+
+  console.log({ data, isLoading })
 
   const table = useReactTable({
-    data: usefulList,
+    data: [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -137,14 +165,34 @@ export function TodoList({ className, initialList }: { className: string, initia
     },
   });
 
-  console.log(initialList);
-  console.log(usefulList);
-  console.log('aaaaaaaaaaaaaaaaaaa');
   return (
     <FilterStoreProvider>
-      <div className={"w-[500px] " + className}>
+      <div className={cn('w-[500px]', className)}>
         <TodoHeader table={table} />
-        <TasksScroll initialList={initialList} table={table} columns={columns} />
+        <div className="rounded-md border">
+          <TableTodo>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder ?? 
+                          flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+          </TableTodo>
+          <ScrollArea className="h-[400px]">
+            <FilteredStatus rows={[]} columns={columns} />
+          </ScrollArea>
+        </div>
       </div>
     </FilterStoreProvider>
   );

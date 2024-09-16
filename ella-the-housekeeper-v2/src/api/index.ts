@@ -1,10 +1,10 @@
-import { ShortList } from "@/components/todo/TodoList";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import type { ShortList } from "@/components/todo/TodoList";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
-import { FormEventHandler } from "react";
+import type { FormEventHandler } from "react";
+import type { TypedSupabaseClient } from '@/utils/types'
 
-export const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL as string, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string);
-
+/*
 export async function formatRow(
     title:FormEventHandler<HTMLButtonElement>,
     deadline:FormEventHandler<HTMLButtonElement> | undefined,
@@ -91,4 +91,19 @@ export async function deleteRow(
     throw new Error(error.message);
   }
   return {data, error};
+}
+*/
+
+export function getCountryById(client: TypedSupabaseClient, countryId: number) {
+  return client
+    .from('countries')
+    .select(
+      `
+      id,
+      name
+    `
+    )
+    .eq('id', countryId)
+    .throwOnError()
+    .single()
 }
