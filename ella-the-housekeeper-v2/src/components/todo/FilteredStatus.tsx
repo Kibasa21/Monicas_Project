@@ -2,14 +2,16 @@ import { ColumnDef, flexRender, Table as TableTodo } from "@tanstack/react-table
 import { Table, TableBody, TableCell, TableRow } from "../ui/table";
 import { ShortList } from "./TodoList";
 import React from "react";
+import { useFilterStore } from "@/store/filter-status-context";
 
-export default function FilteredStatus({ table, columns, filter }: {
+export default function FilteredStatus({ table, columns }: {
   table: TableTodo<ShortList>,
-  columns: ColumnDef<ShortList>[],
-  filter: string
+  columns: ColumnDef<ShortList>[]
 }): JSX.Element {
 
   let isEmpty = true;
+
+  const { status: filter} = useFilterStore();
 
   console.log(filter);
 

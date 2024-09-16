@@ -4,11 +4,8 @@ import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
-  Row,
   SortingState,
-  Table,
   VisibilityState,
-  flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
@@ -19,19 +16,14 @@ import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "../../components/ui/input";
-import {
-  Table as TableTodo,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import RemainingTime from "../CurrentTime";
 import { TodoForm } from "./TodoForm";
-import { ScrollArea } from "../ui/scroll-area";
 import { deleteRow, supabase, updateRow } from "@/app/api/supabaseQuery";
 import SelectStatusFilter from "./SelectStatusFilter";
-import FilteredStatus from "./FilteredStatus";
 import ChangeStatus from "../ui/change-status";
+import { TasksScroll } from "./TasksScroll";
+import { FilterStoreProvider } from "@/store/filter-status-context";
+import { TodoHeader } from "./TodoHeader";
 
 export type ShortList = {
   id: string;
@@ -80,9 +72,8 @@ export const columns: ColumnDef<ShortList>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      console.log(row.original.status, row.original.title);
       return (
-          row.original.status === 'In Progress' ?
+        row.original.status === 'In Progress' ?
           <ChangeStatus time={row.original.deadline} setTime={new Date()} row={row} />
           :
           <div className="capitalize">{row.original.status}</div>
@@ -117,28 +108,6 @@ export const columns: ColumnDef<ShortList>[] = [
   },
 ];
 
-  // Função para atualizar os dados
-  const updateData = async (initialList: ShortList[], table: Table<ShortList>) => {
-    console.log(initialList[6])
-    const updatePromises = table.getRowModel().rows.map(async (row, index) => {
-      console.log(initialList[index]);
-      if(initialList[index]===undefined) {
-        console.log('undefined')
-        return await updateRow("TodoList", "id", row.original.id, { status: row.original.status }, supabase);
-      }
-      if (row.original.status !== initialList[index].status) {
-        console.log('passou')
-        return await updateRow("TodoList", "id", row.original.id, { status: row.original.status }, supabase);
-      }
-      if (new Date().getTime() - row.original.deadline.getTime() > (1000 * 60 * 60 * 24 * 30)) {
-        return await deleteRow("TodoList", "id", row.original.id, supabase);
-      }
-      return Promise.resolve();
-    });
-
-    await Promise.all(updatePromises);
-  };
-
 export function TodoList({ className, initialList }: { className: string, initialList: ShortList[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -147,11 +116,9 @@ export function TodoList({ className, initialList }: { className: string, initia
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [filter, setFilter] = React.useState<string>('In Progress');
-  const [reload, setReload] = React.useState<number>(0);
 
-  const usefulList = [...initialList];
-  
+  const usefulList: ShortList[] = [...initialList.map((item) => ({ ...item }))];
+
   const table = useReactTable({
     data: usefulList,
     columns,
@@ -171,82 +138,14 @@ export function TodoList({ className, initialList }: { className: string, initia
   });
 
   console.log(initialList);
-  console.log(rowSelection)
-
-  // Efeito para salvar dados periodicamente
-  React.useEffect(() => {
-    const saveInterval = setInterval(async() => {
-      await updateData(initialList, table);
-      console.log(reload);
-      setReload((prevReload: number) => prevReload + 1);
-    }, 1*1000*60); // Salva a cada 60 segundos
-
-    return () => clearInterval(saveInterval);
-  }, [table]);
-
-  // Efeito para tentar salvar dados antes de descarregar a página
-  React.useEffect(() => {
-    const handleUnload = async () => {
-      // Nota: Isso pode não funcionar em todos os navegadores para operações assíncronas
-      await updateData(initialList, table);
-    };
-
-    window.addEventListener('unload', handleUnload);
-
-    return () => {
-      window.removeEventListener('unload', handleUnload);
-    };
-  }, []);
-
+  console.log(usefulList);
+  console.log('aaaaaaaaaaaaaaaaaaa');
   return (
-    <div className={"w-[500px] " + className}>
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter Tasks..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <TodoForm table={table} />
-        <SelectStatusFilter content={
-          ['In Progress', 'Success', 'Pending', 'All']
-        }
-          filter={setFilter}
-          label="Status"
-          placeholder="In Progress"
-        />
+    <FilterStoreProvider>
+      <div className={"w-[500px] " + className}>
+        <TodoHeader table={table} />
+        <TasksScroll initialList={initialList} table={table} columns={columns} />
       </div>
-      <div className="rounded-md border">
-        <TableTodo>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-        </TableTodo>
-        <ScrollArea className="h-[400px]">
-          <FilteredStatus table={table} columns={columns} filter={filter} />
-        </ScrollArea>
-      </div>
-      {/* <div className="flex-1 text-sm text-muted-foreground text-center py-1">
-        {table.getFilteredSelectedRowModel().rows.length} of{" "}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
-      </div> */}
-    </div>
+    </FilterStoreProvider>
   );
 }
