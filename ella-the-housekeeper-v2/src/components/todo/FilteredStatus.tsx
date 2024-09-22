@@ -1,11 +1,11 @@
-import { ColumnDef, flexRender, Table as TableTodo } from "@tanstack/react-table"
+import { ColumnDef, flexRender, Row, Table as TableTodo } from "@tanstack/react-table"
 import { Table, TableBody, TableCell, TableRow } from "../ui/table"
 import { ShortList } from "./TodoList"
 import React from "react"
 import { useFilterStore } from "@/store/filter-status-context"
 
 export default function FilteredStatus({ rows, columns }: {
-  rows: any[]
+  rows: Row<ShortList>[]
   columns: ColumnDef<ShortList>[]
 }): JSX.Element {
   const { status: filter} = useFilterStore()

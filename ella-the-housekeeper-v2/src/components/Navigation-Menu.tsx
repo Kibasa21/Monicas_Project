@@ -13,6 +13,11 @@ import {
 import { PendingListItem } from "./PendingListItem"
 import { FallBackComponent } from "./ui/fall-back-component"
 import ShelfHover from "./ShelfHover"
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query"
+import { cookies } from "next/headers"
+import useSupabaseServer from "@/utils/supabase-server"
+import { getRowByStatus } from "@/api"
+import { prefetchQuery } from "@supabase-cache-helpers/postgrest-react-query"
 
 export type componentsType = {
   title: string
@@ -22,19 +27,24 @@ export type componentsType = {
 
 export type shelfDescriptionsType = {
   navegationTitles: string[];
-    navegationDescriptions: {
-      shelfTitles: string[];
-      shelfDescriptions: {
-        foodSupplies: string;
-        cleaningSupplies: string;
-        hygieneSupplies: string;
-      };
+  navegationDescriptions: {
+    shelfTitles: string[];
+    shelfDescriptions: {
+      foodSupplies: string;
+      cleaningSupplies: string;
+      hygieneSupplies: string;
     };
+  };
 }
 
-export function NavigationMenuComponent({ content }: {
+export async function NavigationMenuComponent({ content }: {
   content: shelfDescriptionsType
 }) {
+  const queryClient = new QueryClient()
+  const cookieStore = cookies()
+  const supabase = useSupabaseServer(cookieStore)
+
+  await prefetchQuery(queryClient, getRowByStatus(supabase, 'Pending'))
 
   return (
     <NavigationMenu>
@@ -43,9 +53,9 @@ export function NavigationMenuComponent({ content }: {
         <NavigationMenuItem>
           <NavigationMenuTrigger className="text-base font-semibold"><Link href="/todo">{content.navegationTitles[1]}</Link></NavigationMenuTrigger>
           <NavigationMenuContent>
-            <React.Suspense fallback={<FallBackComponent/>}>
+            <HydrationBoundary state={dehydrate(queryClient)}>
               <PendingListItem />
-            </React.Suspense>
+            </HydrationBoundary>
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>

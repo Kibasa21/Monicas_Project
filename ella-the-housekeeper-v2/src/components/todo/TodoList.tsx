@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useSupabaseBrowser }  from '@/utils/supabase-browser'
+import { useSupabaseBrowser } from '@/utils/supabase-browser'
 import { ArrowUpDown } from "lucide-react";
 import { useQuery } from '@tanstack/react-query'
 
@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/table";
 import { ScrollArea } from "../ui/scroll-area";
 import FilteredStatus from "./FilteredStatus";
+import { useTodoQuery } from "@/hooks/use-todo-query";
 
 export type ShortList = {
   id: string;
@@ -135,20 +136,14 @@ export function TodoList({ className }: { className: string }) {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const queryClient = new QueryClient()
-  //const cookieStore = cookies()
   const supabase = useSupabaseBrowser()
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['app', 'todos', 'list'],
-    queryFn: () => supabase.from(table).select(columns.join(","))
-  })
-  
+  const { data, isLoading, isError, error } = useTodoQuery(['id', 'deadline', 'status', 'title'])
 
   console.log({ data, isLoading })
 
   const table = useReactTable({
-    data: [],
+    data: data ?? [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -177,7 +172,7 @@ export function TodoList({ className }: { className: string }) {
                   {headerGroup.headers.map((header) => {
                     return (
                       <TableHead key={header.id}>
-                        {header.isPlaceholder ?? 
+                        {header.isPlaceholder ??
                           flexRender(
                             header.column.columnDef.header,
                             header.getContext()
