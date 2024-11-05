@@ -1,8 +1,4 @@
-import type { ShortList } from "@/components/todo/TodoList";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { revalidatePath } from "next/cache";
-import type { FormEventHandler } from "react";
-import type { TypedSupabaseClient } from '@/utils/types'
+import type { TypedSupabaseClient } from "@/utils/types";
 
 // export async function formatRow(
 //     title:FormEventHandler<HTMLButtonElement>,
@@ -93,14 +89,32 @@ import type { TypedSupabaseClient } from '@/utils/types'
 // }
 
 export function getColumns(client: TypedSupabaseClient, columns: string[]) {
-  return client
-    .from('TodoList')
-    .select(columns.join(','))
+  return client.from("TodoList").select(columns.join(","));
 }
 
 export function getRowByStatus(client: TypedSupabaseClient, status: string) {
-  return client
-    .from('TodoList')
-    .select('*')
-    .eq('status', status)
+  return client.from("TodoList").select("*").eq("status", status);
+}
+
+export function getRowById(client: TypedSupabaseClient, id: number) {
+  return client.from("TodoList").select("*").eq("id", id);
+}
+
+export function deleteRow(client: TypedSupabaseClient, id: string) {
+  return client.from("TodoList").delete().eq("id", id);
+}
+
+export function updateRow(
+  client: TypedSupabaseClient,
+  id: string,
+  row: Record<string, any>
+) {
+  return client.from("TodoList").update(row).eq("id", id);
+}
+
+export function insertRow(
+  client: TypedSupabaseClient,
+  row: Record<string, any>
+) {
+  return client.from("TodoList").insert(row);
 }

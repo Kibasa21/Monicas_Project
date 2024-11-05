@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import * as React from "react";
 import {
@@ -13,15 +13,18 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useSupabaseBrowser } from '@/utils/supabase-browser'
+import useSupabaseBrowser from "@/utils/supabase-browser";
 import { ArrowUpDown } from "lucide-react";
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from "@tanstack/react-query";
 
-import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query'
-import { prefetchQuery } from '@supabase-cache-helpers/postgrest-react-query'
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { prefetchQuery } from "@supabase-cache-helpers/postgrest-react-query";
 //import { cookies } from 'next/headers'
-import { getCountryById } from '@/api'
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -66,7 +69,7 @@ export const columns: ColumnDef<ShortList>[] = [
     // ),
     cell: ({ row }) => (
       <Checkbox
-        defaultChecked={row.original.status === 'Success'}
+        defaultChecked={row.original.status === "Success"}
         //checked={row.getIsSelected()}
         onCheckedChange={(value) => {
           row.toggleSelected(!!value);
@@ -91,18 +94,23 @@ export const columns: ColumnDef<ShortList>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      return (
-        row.original.status === 'In Progress' ?
-          <ChangeStatus time={row.original.deadline} setTime={new Date()} row={row} />
-          :
-          <div className="capitalize">{row.original.status}</div>
-      )
+      return row.original.status === "In Progress" ? (
+        <ChangeStatus
+          time={row.original.deadline}
+          setTime={new Date()}
+          row={row}
+        />
+      ) : (
+        <div className="capitalize">{row.original.status}</div>
+      );
     },
   },
   {
     accessorKey: "title",
     header: () => <div className="text-right">Task</div>,
-    cell: ({ row }) => <div className="lowercase text-left">{row.getValue("title")}</div>,
+    cell: ({ row }) => (
+      <div className="lowercase text-left">{row.getValue("title")}</div>
+    ),
   },
   {
     accessorKey: "deadline",
@@ -136,15 +144,20 @@ export function TodoList({ className }: { className: string }) {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const supabase = useSupabaseBrowser()
+  const supabase = useSupabaseBrowser();
 
-  const { data, isLoading, isError, error } = useTodoQuery(['id', 'deadline', 'status', 'title'])
+  const { data, isLoading, isError, error } = useTodoQuery([
+    "id",
+    "deadline",
+    "status",
+    "title",
+  ]);
 
-  console.log({ data, isLoading })
+  console.log({ data, isLoading });
 
   const table = useReactTable({
     data: data ?? [],
-    columns,
+    columns: columns as any[],
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -162,7 +175,7 @@ export function TodoList({ className }: { className: string }) {
 
   return (
     <FilterStoreProvider>
-      <div className={cn('w-[500px]', className)}>
+      <div className={cn("w-[500px]", className)}>
         <TodoHeader table={table} />
         <div className="rounded-md border">
           <TableTodo>
@@ -185,7 +198,7 @@ export function TodoList({ className }: { className: string }) {
             </TableHeader>
           </TableTodo>
           <ScrollArea className="h-[400px]">
-            <FilteredStatus rows={[]} columns={columns} />
+            <FilteredStatus rows={table.getRowModel().rows} columns={columns} />
           </ScrollArea>
         </div>
       </div>
