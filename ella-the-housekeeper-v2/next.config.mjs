@@ -4,7 +4,12 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "img.freepik.com",
+        hostname: "as2.ftcdn.net",
+        pathname: "**",
+      },
+      {
+        protocol: "https",
+        hostname: "as1.ftcdn.net",
         pathname: "**",
       },
     ],
