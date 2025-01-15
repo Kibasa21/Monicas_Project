@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableRow } from "../ui/table";
 import { ShortList } from "./TodoList";
-import React from "react";
+import React, { type JSX } from "react";
 import { useFilterStore } from "@/store/filter-status-context";
 import { useDescriptionStore } from "@/store/description-context";
 

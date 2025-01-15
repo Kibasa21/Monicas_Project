@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils"
 import { UseFormReturn } from "react-hook-form";
 import { Textarea } from "../textarea";
 
+import type { JSX } from "react";
+
 export default function FormTextArea({ form, name, label, placeholder }: {
     form: UseFormReturn<any, any, undefined>,
     label: string,

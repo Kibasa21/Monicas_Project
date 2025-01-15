@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { type JSX } from "react";
 import ChangeableImage from "./ChangeableImage";
 import ListItem from "./ListItem";
 import { shelfDescriptionsType } from "./Navigation-Menu";

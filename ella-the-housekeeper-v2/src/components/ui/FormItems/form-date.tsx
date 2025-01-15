@@ -14,6 +14,8 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { TimePicker } from "../time-picker";
 
+import type { JSX } from "react";
+
 export default function FormDate({
   form,
   name,

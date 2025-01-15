@@ -1,6 +1,8 @@
 import { JSDOM } from "jsdom";
 import { NextApiRequest, NextApiResponse } from "next";
 
+import type { JSX } from "react";
+
 const getProducts = async (): Promise<JSX.Element> => {
   const response = await fetch("https://www.samsclub.com.br/acougue?page=2");
   const html = await response.text();

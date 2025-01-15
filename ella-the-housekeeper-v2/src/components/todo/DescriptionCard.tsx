@@ -1,5 +1,4 @@
-"use client";
-
+"use client";;
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -22,6 +21,8 @@ import {
 } from "@/components/ui/select";
 import { useDescriptionCard } from "@/hooks/use-description-card";
 import { useDescriptionStore } from "@/store/description-context";
+
+import type { JSX } from "react";
 
 export function DescriptionCard({
   className,

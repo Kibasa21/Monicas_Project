@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, type JSX } from "react";
 import {
   type ColumnDef,
   flexRender,

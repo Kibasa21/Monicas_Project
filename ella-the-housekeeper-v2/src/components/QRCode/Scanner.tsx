@@ -1,7 +1,11 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import QrReader from "react-qr-scanner";
+import {
+  IBoundingBox,
+  IPoint,
+  Scanner as QRScanner,
+} from "@yudiel/react-qr-scanner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,18 +18,29 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
+import dataRetrieval from "./DataRetrieval";
+import { useProductsRetrieval } from "@/hooks/use-products-retrieval";
+
+interface IDetectedBarcode {
+  boundingBox: IBoundingBox;
+  cornerPoints: IPoint[];
+  format: string;
+  rawValue: string;
+}
 
 const Scanner: React.FC = () => {
   const [result, setResult] = useState<string>("No result");
+  // const { data, isLoading, isError, error } = useProductsRetrieval();
 
-  const handleScan = useCallback((data: string | null) => {
+  // console.log(data);
+
+  const handleScan = useCallback((data: IDetectedBarcode[]) => {
     if (data) {
-      setResult(data.text);
-      console.log(data);
+      setResult("Products extracted from QR code");
     }
   }, []);
 
-  const handleError = useCallback((err: Error) => {
+  const handleError = useCallback((err: unknown) => {
     console.error(err);
   }, []);
 
@@ -38,18 +53,21 @@ const Scanner: React.FC = () => {
         <AlertDialogHeader>
           <div className="flex flex-col gap-y-4">
             <AlertDialogTitle>QR Code Scanner</AlertDialogTitle>
-            <QrReader
-              delay={300}
-              facingMode="environment"
-              onError={handleError}
+            <QRScanner
+              scanDelay={300}
               onScan={handleScan}
-              style={{ width: "100%", height: "100%" }}
+              styles={{
+                video: { width: "100%", height: "100%" },
+                container: { width: "100%", height: "100%" },
+                finderBorder: 0,
+              }}
+              components={{ finder: false }}
             />
             <AlertDialogDescription>{result}</AlertDialogDescription>
           </div>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={dataRetrieval}>Cancel</AlertDialogCancel>
           <AlertDialogAction>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

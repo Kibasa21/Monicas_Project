@@ -1,5 +1,5 @@
 import { ShortList, TodoList } from "@/components/todo/TodoList";
-import React from "react";
+import React, { type JSX } from "react";
 import { DescriptionCard } from "@/components/todo/DescriptionCard";
 import { DescriptionStoreProvider } from "@/store/description-context";
 

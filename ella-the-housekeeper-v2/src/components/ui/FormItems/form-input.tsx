@@ -9,6 +9,8 @@ import { Input } from "../input"
 import { cn } from "@/lib/utils"
 import { UseFormReturn } from "react-hook-form";
 
+import type { JSX } from "react";
+
 export default function FormInput({ form, name, label, placeholder }: {
     form: UseFormReturn<any, any, undefined>,
     label: string,

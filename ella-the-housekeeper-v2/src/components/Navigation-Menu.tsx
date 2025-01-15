@@ -47,7 +47,7 @@ export async function NavigationMenuComponent({
   content: shelfDescriptionsType;
 }) {
   const queryClient = new QueryClient();
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const supabase = useSupabaseServer(cookieStore);
 
   await prefetchQuery(queryClient, getRowByStatus(supabase, "Pending"));

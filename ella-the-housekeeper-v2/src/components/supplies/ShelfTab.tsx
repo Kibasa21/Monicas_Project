@@ -3,6 +3,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { ShelfTabElement } from "./ShelfTabElement";
 import { Separator } from "../ui/separator";
 
+import type { JSX } from "react";
+
 export function ShelfTab({
   shelfElements,
   tabName,

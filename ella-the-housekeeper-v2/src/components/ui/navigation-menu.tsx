@@ -1,9 +1,9 @@
 import * as React from "react"
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu"
-import { cva } from "class-variance-authority"//This cva function is used to create a class variance authority that can be used to create a dynamic class name based on the state of the component.
+import { cva } from "class-variance-authority"
 import { ChevronDown } from "lucide-react"
 
-import { cn } from "@/lib/utils"//cn is a function that takes any number of arguments and returns a string that concatenates all the arguments that are strings.
+import { cn } from "@/lib/utils"
 
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,

@@ -1,19 +1,20 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
+import * as React from "react";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
-export function ModeToggle() { //ModeToggle is a component that toggles between light and dark mode
-  const { setTheme } = useTheme()
+export function ModeToggle() {
+  //ModeToggle is a component that toggles between light and dark mode
+  const { setTheme } = useTheme();
 
   return (
     <DropdownMenu>
@@ -36,5 +37,5 @@ export function ModeToggle() { //ModeToggle is a component that toggles between 
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

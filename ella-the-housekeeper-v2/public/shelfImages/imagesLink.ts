@@ -1,4 +1,8 @@
-export const imagesLink = {
+type ShelfImages = {
+  [key: string]: string;
+};
+
+export const imagesLink: ShelfImages = {
   Frango:
     "https://as1.ftcdn.net/jpg/04/58/77/76/1000_F_458777634_jWTLfLz7BeVZIt4aN0oNdtcnIj4WtE74.webp",
   "Carne Bovina":
