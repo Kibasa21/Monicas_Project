@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import type React from "react";
+import { useState, useCallback } from "react";
 import {
-  IBoundingBox,
-  IPoint,
+  type IBoundingBox,
+  type IPoint,
   Scanner as QRScanner,
 } from "@yudiel/react-qr-scanner";
 import {
@@ -53,6 +54,7 @@ const Scanner: React.FC = () => {
         <AlertDialogHeader>
           <div className="flex flex-col gap-y-4">
             <AlertDialogTitle>QR Code Scanner</AlertDialogTitle>
+
             <QRScanner
               scanDelay={300}
               onScan={handleScan}
@@ -67,7 +69,7 @@ const Scanner: React.FC = () => {
           </div>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={dataRetrieval}>Cancel</AlertDialogCancel>
+        <AlertDialogCancel onClick={dataRetrieval}>Cancel</AlertDialogCancel>
           <AlertDialogAction>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

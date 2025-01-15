@@ -15,16 +15,18 @@ const dataRetrieval = async (): Promise<{
 
     const html = await response.text();
     const dom = new JSDOM(html);
-    const document = dom.window.document;
-    const products = Array.from(document.querySelectorAll("tbody"));
+    //const document = dom.window.document;
+    //const products = Array.from(document.querySelectorAll("tbody"));
 
+    /*
     const productContents = products.map(
       (product) => product.textContent?.trim() || ""
     );
+    */
 
-    console.log(productContents);
+    console.log(html);
 
-    return { status: "Successful", products: productContents };
+    return { status: "Successful", products: html };
   } catch (error) {
     console.error("Failed to fetch and parse data:", error);
     return { status: "Failed", products: [] };
