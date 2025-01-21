@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "i18nexus pull && next dev --turbopack",
+    "dev": "next dev --turbopack",
     "build": "i18nexus pull && next build",
     "start": "i18nexus pull && next start",
     "lint": "next lint"
@@ -60,6 +60,7 @@
     "i18next": "^23.13.0",
     "i18next-resources-to-backend": "^1.2.1",
     "input-otp": "^1.4.2",
+    "jsdom": "^26.0.0",
     "lucide-react": "^0.427.0",
     "net": "^1.0.2",
     "next": "15.1.4",

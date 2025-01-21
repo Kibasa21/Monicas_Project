@@ -20,7 +20,6 @@ import {
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
 import dataRetrieval from "./DataRetrieval";
-import { useProductsRetrieval } from "@/hooks/use-products-retrieval";
 
 interface IDetectedBarcode {
   boundingBox: IBoundingBox;
@@ -31,9 +30,6 @@ interface IDetectedBarcode {
 
 const Scanner: React.FC = () => {
   const [result, setResult] = useState<string>("No result");
-  // const { data, isLoading, isError, error } = useProductsRetrieval();
-
-  // console.log(data);
 
   const handleScan = useCallback((data: IDetectedBarcode[]) => {
     if (data) {
@@ -69,7 +65,7 @@ const Scanner: React.FC = () => {
           </div>
         </AlertDialogHeader>
         <AlertDialogFooter>
-        <AlertDialogCancel onClick={dataRetrieval}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
