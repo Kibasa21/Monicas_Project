@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, Dispatch, SetStateAction } from "react";
 import {
   IBoundingBox,
   IPoint,
@@ -17,6 +17,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
+import { Button } from "../ui/button";
 
 interface IDetectedBarcode {
   boundingBox: IBoundingBox;
@@ -33,9 +34,11 @@ export type Product = {
   pricePerUnit: number;
 };
 
-const Reader: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-
+const Reader = ({
+  setProducts,
+}: {
+  setProducts: Dispatch<SetStateAction<Product[]>>;
+}) => {
   const handleScan = useCallback((data: IDetectedBarcode[]) => {
     if (data && data.length > 0) {
       const scannedUrl = data[0].rawValue;
@@ -64,44 +67,37 @@ const Reader: React.FC = () => {
   }, []);
 
   return (
-    <>
-      <AlertDialogHeader>
-        <div className="flex flex-col gap-y-4">
-          <AlertDialogTitle>QR Code Scanner</AlertDialogTitle>
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="outline">Scan QR code</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <div className="flex flex-col gap-y-4">
+            <AlertDialogTitle>QR Code Scanner</AlertDialogTitle>
 
-          <QRScanner
-            scanDelay={300}
-            onScan={handleScan}
-            onError={handleError}
-            styles={{
-              video: { width: "100%", height: "100%" },
-              container: { width: "100%", height: "100%" },
-              finderBorder: 0,
-            }}
-            components={{ finder: false }}
-          />
-          <AlertDialogDescription>
-            Put the QR code on the screen
-          </AlertDialogDescription>
-          {products.length > 0 && (
-            <div>
-              <h2>Fetched Products:</h2>
-              <ul>
-                {products.map((product, index) => (
-                  <li key={index}>
-                    {product.name} - {product.pricePerUnit}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      </AlertDialogHeader>
-      <AlertDialogFooter>
-        <AlertDialogCancel>Cancel</AlertDialogCancel>
-        <AlertDialogAction>Organize</AlertDialogAction>
-      </AlertDialogFooter>
-    </>
+            <QRScanner
+              scanDelay={300}
+              onScan={handleScan}
+              onError={handleError}
+              styles={{
+                video: { width: "100%", height: "100%" },
+                container: { width: "100%", height: "100%" },
+                finderBorder: 0,
+              }}
+              components={{ finder: false }}
+            />
+            <AlertDialogDescription>
+              Put the QR code on the screen
+            </AlertDialogDescription>
+          </div>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction>Organize</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 

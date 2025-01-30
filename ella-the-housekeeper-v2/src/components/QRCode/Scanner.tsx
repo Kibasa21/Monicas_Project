@@ -1,23 +1,26 @@
 "use client";
 
+import { useState } from "react";
 import {
   AlertDialog,
   AlertDialogContent,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
-import Reader from "./Reader";
+import Reader, { Product } from "./Reader";
+import { Organizer } from "./Organizer";
 
 const Scanner: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="outline">Scan QR code</Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <Reader />
-      </AlertDialogContent>
-    </AlertDialog>
+    <>
+      {products.length == 0 ? (
+        <Reader setProducts={setProducts} />
+      ) : (
+        <Organizer products={products} />
+      )}
+    </>
   );
 };
 
