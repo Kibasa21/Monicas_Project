@@ -36,8 +36,6 @@ export const ShelfTabElement: React.FC<FoodTabProps> = ({
     setPathname(window.location.pathname);
   }, []);
 
-  console.log(pathname);
-
   return (
     <div className={cn("space-y-3", className)} {...props}>
       <Link href={`${pathname}/${name}`}>

@@ -1,4 +1,6 @@
-const jsdom = require("jsdom");
+import { NextApiRequest, NextApiResponse } from "next";
+import { JSDOM } from "jsdom";
+import { NextRequest, NextResponse } from "next/server";
 
 export type Product = {
   name: string;
@@ -39,12 +41,13 @@ const dataRetrieval = async (receiptLink: string): Promise<Product[]> => {
     method: "GET",
     mode: "cors",
   });
+
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 
   const html = await response.text();
-  const dom = new jsdom.JSDOM(html);
+  const dom = new JSDOM(html);
   const products = Array.from(
     dom.window.document.querySelectorAll(
       "span.txtTit, span.RCod, span.Rqtd, span.RUN, span.RvlUnit"
@@ -54,11 +57,21 @@ const dataRetrieval = async (receiptLink: string): Promise<Product[]> => {
     (product) => product.textContent?.trim() || ""
   );
 
-  const result = ObjectCreator(resultPrimitive);
-
-  console.log(result);
-
-  return result;
+  return ObjectCreator(resultPrimitive);
 };
 
-export default dataRetrieval;
+// API Route Handler
+export async function POST(req: NextRequest) {
+  try {
+    const { receiptLink } = await req.json();
+    const products = await dataRetrieval(receiptLink);
+
+    return NextResponse.json(products, { status: 200 });
+  } catch (error) {
+    console.error("Fetch error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch data" },
+      { status: 500 }
+    );
+  }
+}
