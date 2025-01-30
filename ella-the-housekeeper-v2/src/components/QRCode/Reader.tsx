@@ -17,7 +17,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
-import { Product } from "./DataRetrieval";
 
 interface IDetectedBarcode {
   boundingBox: IBoundingBox;
@@ -25,6 +24,14 @@ interface IDetectedBarcode {
   format: string;
   rawValue: string;
 }
+
+export type Product = {
+  name: string;
+  code: number;
+  quantity: number;
+  unit: string;
+  pricePerUnit: number;
+};
 
 const Reader: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
