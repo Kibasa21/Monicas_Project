@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ import { useDescriptionCard } from "@/hooks/use-description-card";
 import { useDescriptionStore } from "@/store/description-context";
 
 import type { JSX } from "react";
+import { SkeletonCard } from "./skeletonCard";
 
 export function DescriptionCard({
   className,
@@ -35,9 +36,9 @@ export function DescriptionCard({
   const { data, isLoading } = useDescriptionCard(id as number);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <SkeletonCard className={className} />;
   } else if (!data) {
-    return <div>No data</div>;
+    return <div className={className}>No data</div>;
   }
 
   return (

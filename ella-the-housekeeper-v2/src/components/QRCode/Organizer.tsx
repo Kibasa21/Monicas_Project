@@ -156,7 +156,7 @@ export function Organizer({ products }: { products: Product[] }) {
                         </FormItem>
                       )}
                     />
-                    <Separator />
+
                     <FormField
                       control={form.control}
                       name="unit"
@@ -188,7 +188,7 @@ export function Organizer({ products }: { products: Product[] }) {
                         </FormItem>
                       )}
                     />
-                    <Separator />
+
                     <FormField
                       control={form.control}
                       name="qnt"
@@ -211,7 +211,7 @@ export function Organizer({ products }: { products: Product[] }) {
                         </FormItem>
                       )}
                     />
-                    <Separator />
+
                     <FormField
                       control={form.control}
                       name="pricePerUnit"
@@ -234,7 +234,7 @@ export function Organizer({ products }: { products: Product[] }) {
                         </FormItem>
                       )}
                     />
-                    <Separator />
+
                     {/* <FormField
                   control={form.control}
                   name="deadline"
