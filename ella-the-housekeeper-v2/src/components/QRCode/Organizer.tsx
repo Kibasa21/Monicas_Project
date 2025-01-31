@@ -43,6 +43,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { ScrollArea } from "../ui/scroll-area";
+import { Separator } from "../ui/separator";
 
 const FormSchema = z.object({
   name: z
@@ -54,6 +55,12 @@ const FormSchema = z.object({
     }),
   unit: z.string({
     required_error: "Please select an email to display.",
+  }),
+  qnt: z.string({
+    required_error: "Please enter the quantity.",
+  }),
+  pricePerUnit: z.string({
+    required_error: "Please enter the price per unit.",
   }),
   deadline: z.date({
     required_error: "A deadline is required.",
@@ -118,63 +125,117 @@ export function Organizer({ products }: { products: Product[] }) {
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="sm:max-w-[425px]">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              {products.map((product, index) => (
-                <div key={product.code}>
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Product name</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Croissant"
-                            {...field}
-                            defaultValue={product.name}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          {"Put the name of your " +
-                            (index + 1) +
-                            "th product here"}
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="unit"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>description</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          value={product.unit}
-                        >
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <ScrollArea className="h-72 w-full rounded-md">
+              <div className="grid grid-cols-1 gap-y-10">
+                {products.map((product, index) => (
+                  <div
+                    key={product.code}
+                    className="border border-solid rounded-md"
+                  >
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Product name</FormLabel>
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select the unit" />
-                            </SelectTrigger>
+                            <Input
+                              placeholder="Croissant"
+                              {...field}
+                              defaultValue={product.name}
+                            />
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="UN">UN</SelectItem>
-                            <SelectItem value="KG">KG</SelectItem>
-                            <SelectItem value="L">L</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Select the unit of the product
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  {/* <FormField
+                          <FormDescription>
+                            {"Put the name of your " +
+                              (index + 1) +
+                              "th product here"}
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Separator />
+                    <FormField
+                      control={form.control}
+                      name="unit"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>description</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            value={product.unit}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select the unit" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="UN">UN</SelectItem>
+                              <SelectItem value="KG">KG</SelectItem>
+                              <SelectItem value="L">L</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            {"Select the unit of your " +
+                              (index + 1) +
+                              "th product here"}
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Separator />
+                    <FormField
+                      control={form.control}
+                      name="qnt"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Quantity</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="20"
+                              {...field}
+                              defaultValue={product.quantity.toString()}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            {"Put the quantity of your " +
+                              (index + 1) +
+                              "th product here"}
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Separator />
+                    <FormField
+                      control={form.control}
+                      name="pricePerUnit"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{"Price per unit (R$/UN)"}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="20"
+                              {...field}
+                              defaultValue={product.pricePerUnit.toString()}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            {"Put the price per unit of your " +
+                              (index + 1) +
+                              "th product here"}
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Separator />
+                    {/* <FormField
                   control={form.control}
                   name="deadline"
                   render={({ field }) => (
@@ -218,13 +279,14 @@ export function Organizer({ products }: { products: Product[] }) {
                     </FormItem>
                   )}
                 /> */}
-                </div>
-              ))}
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
 
-              <Button type="submit">Submit</Button>
-            </form>
-          </Form>
-        </ScrollArea>
+            <Button type="submit">Submit</Button>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
